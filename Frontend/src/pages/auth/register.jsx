@@ -22,6 +22,7 @@ function AuthRegister() {
     dispatch(registerUser(formData)).then((data) => {
       if (data?.payload?.success) {
         toast(data?.payload?.message);
+        console.log(data)
         navigate("/auth/login");
       } else {
         toast(data?.payload?.message)

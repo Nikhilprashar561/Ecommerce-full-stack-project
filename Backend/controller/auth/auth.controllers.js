@@ -1,45 +1,48 @@
-import bcryptjs from "bcryptjs"
-import jwt from "jsonwebtoken"
-import { UserModels } from "../../models/User.js"
+import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { UserModels } from "../../models/User.js";
 
 const register = async (req, res) => {
-    const {username, password, email} = req.body
-    try {
-        const checkUser = await UserModels.findOne({ email });
+  const { username, password, email } = req.body;
+  try {
+    const checkUser = await UserModels.findOne({ email });
     if (checkUser)
       return res.json({
         success: false,
         message: "User Already exists with the same email! Please try again",
       });
-        const hashPassword = await bcryptjs.hash(password, 12)
-        const newUser = await UserModels({
-            username, email, password : hashPassword
-        })
-        await newUser.save()
-        return res.status(200).json({
-            success : true,
-            message : "Register User SuccessFully"
-        })
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            success : false,
-            message : "Some Error While Registering"
-        })
-    }
-}
+    const hashPassword = await bcryptjs.hash(password, 12);
+    const newUser = await UserModels({
+      username,
+      email,
+      password: hashPassword,
+    });
+    await newUser.save();
+    return res.status(200).json({
+      success: true,
+      message: "Register User SuccessFully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: "Some Error While Registering",
+    });
+  }
+};
 
 const login = async (req, res) => {
-    const {username, password, email} = req.body
-    try {
-         const checkUser = await UserModels.findOne({ email });
+  const { email, password } = req.body;
+
+  try {
+    const checkUser = await UserModels.findOne({ email });
     if (!checkUser)
       return res.json({
         success: false,
         message: "User doesn't exists! Please register first",
       });
 
-    const checkPasswordMatch = await bcrypt.compare(
+    const checkPasswordMatch = await bcryptjs.compare(
       password,
       checkUser.password
     );
@@ -70,13 +73,13 @@ const login = async (req, res) => {
         userName: checkUser.userName,
       },
     });
-    } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-            success : false,
-            message : "Some Error While Registering"
-        })
-    }
-}
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "Some error occured",
+    });
+  }
+};
 
-export { register, login }
+export { register, login };
